@@ -1,14 +1,29 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/mgutz/logxi/v1"
-	"math/rand"
 	"net"
 	"os"
-	"strconv"
+	"time"
 )
+
+type File struct {
+	Id int `json:"id"`
+	Path    	string		`json:"path"`
+	Value		[]string	`json:"value"`
+}
+
+var gen = (func() func() int {
+	current := 0
+
+	return func() int {
+		current++
+		return current
+	}
+})()
 
 func main() {
 	var (
@@ -16,6 +31,7 @@ func main() {
 		n             uint
 		helpFlag      bool
 	)
+
 	flag.StringVar(&serverAddrStr, "server", "127.0.0.1:6000", "set server IP address and port")
 	flag.UintVar(&n, "n", 10, "set the number of requests")
 	flag.BoolVar(&helpFlag, "help", false, "print options list")
@@ -29,20 +45,41 @@ func main() {
 		log.Error("creating connection to server", "error", err)
 	} else {
 		defer conn.Close()
-
-		buf := make([]byte, 32)
+		sent := make(map[int]bool)
+		var f File
+		buf := make([]byte, 1024*1014)
 		for i := uint(0); i < n; i++ {
-			x := rand.Intn(1000)
-			if _, err := conn.Write([]byte(strconv.Itoa(x))); err != nil {
-				log.Error("sending request to server", "error", err, "x", x)
-			} else if bytesRead, err := conn.Read(buf); err != nil {
-				log.Error("receiving answer from server", "error", err)
-			} else {
-				yStr := string(buf[:bytesRead])
-				if y, err := strconv.Atoi(yStr); err != nil {
-					log.Error("cannot parse answer", "answer", yStr, "error", err)
+			var path string
+			fmt.Println("Enter Path:")
+			fmt.Scan(&path)
+			f.Id = gen()
+			f.Path = path
+			sent[f.Id] = true
+			if json_s, err := json.Marshal(f); err != nil {
+				log.Error("convert to JSON", "error", err)
+			} else if _, err := conn.Write(json_s); err != nil {
+				log.Error("sending request to server", "error", err, "path", f)
+				continue
+			}
+			for {
+				conn.SetReadDeadline(time.Now().Add(time.Second * 2))
+				if bytesRead, err := conn.Read(buf); err != nil {
+					log.Error("receiving answer from server", "error", err)
+					break
 				} else {
-					log.Info("successful interaction with server", "x", x, "y", y)
+					fmt.Println(string(buf[:bytesRead]))
+					if err := json.Unmarshal(buf[:bytesRead], &f); err != nil {
+						log.Error("convert to", "error", err)
+						break
+					} else {
+						if _, ok := sent[f.Id]; !ok {
+							log.Info("Duplicate")
+						} else {
+							delete(sent, f.Id)
+							log.Info("successful interaction with server", "path", f.Path, "result", f.Value)
+							break
+						}
+					}
 				}
 			}
 		}

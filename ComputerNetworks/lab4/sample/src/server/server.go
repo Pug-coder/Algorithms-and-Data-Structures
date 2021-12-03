@@ -1,13 +1,38 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/mgutz/logxi/v1"
+	"io/ioutil"
 	"net"
 	"os"
-	"strconv"
 )
+
+func listDirByReadDir(path string) []string {
+	var files []string
+	lst, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+	for _, val := range lst {
+		if val.IsDir() {
+			//files = append(files, val.Name())
+			//	fmt.Printf("[%s]\n", val.Name())
+		} else {
+			files = append(files, val.Name())
+			//fmt.Println(val.Name())
+		}
+	}
+	return files
+}
+
+type File struct {
+	Id    int      `json:"id"`
+	Path  string   `json:"path"`
+	Value []string `json:"value"`
+}
 
 func main() {
 	var (
@@ -26,18 +51,24 @@ func main() {
 		log.Error("creating listening connection", "error", err)
 	} else {
 		log.Info("server listens incoming messages from clients")
-		buf := make([]byte, 32)
+		buf := make([]byte, 1024*1024)
+		var f File
 		for {
 			if bytesRead, addr, err := conn.ReadFromUDP(buf); err != nil {
 				log.Error("receiving message from client", "error", err)
 			} else {
-				s := string(buf[:bytesRead])
-				if x, err := strconv.Atoi(s); err != nil {
-					log.Error("cannot parse answer", "answer", s, "error", err)
-				} else if _, err = conn.WriteToUDP([]byte(strconv.Itoa(x*2)), addr); err != nil {
-					log.Error("sending message to client", "error", err, "client", addr.String())
+				if err := json.Unmarshal(buf[:bytesRead], &f); err != nil {
+					log.Error("convert to struct", "error", err)
 				} else {
-					log.Info("successful interaction with client", "x", x, "y", x*2, "client", addr.String())
+					f.Value = listDirByReadDir(f.Path)
+
+					if responseBytes, err := json.Marshal(f); err != nil {
+						log.Error("convert to JSON", "error", err)
+					} else if _, err = conn.WriteToUDP(responseBytes, addr); err != nil {
+						log.Error("sending message to client", "error", err, "client", addr.String())
+					} else {
+						log.Info("successful interaction with client", "path", f.Path, "result", f.Value, "client", addr.String())
+					}
 				}
 			}
 		}
