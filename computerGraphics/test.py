@@ -3,22 +3,11 @@ from OpenGL.GL import *
 from math import *
 import random 
 
-def color_change(): 
-    return [
-        random.uniform(0, 1),
-        random.uniform(0, 1),
-        random.uniform(0, 1),
-        1
-    ]
-
-
 angleX = 0.0
 angleY = 0.0
 angleZ = 0.0
 scale = 1
 size = 0.5
-color = color_change()
-
 
 tetta = pi / 5.1045
 phi =  pi / 4
@@ -30,7 +19,6 @@ newMatrix = [
 	0, sin(tetta), cos(phi), 0,
 	0, 0, 0, 1
 ]
-
 
 
 def main():
@@ -51,7 +39,7 @@ def main():
 
 
 def key_callback(window, key, scancode, action, mods):
-    global angleZ, angleX, angleY, scale, color
+    global angleZ, angleX, angleY, scale
     if (action == glfw.REPEAT or action == glfw.PRESS):
         if key == glfw.KEY_RIGHT:
             angleZ -= 2
@@ -73,68 +61,16 @@ def key_callback(window, key, scancode, action, mods):
            	scale = scale * 1.05
         if key == glfw.KEY_MINUS:
         	scale = scale * 0.95
-        if key == glfw.KEY_C:
-            color = color_change()
 
-
-def draw_cube():
-# Левая грань
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(-size, -size, -size)
-    glVertex3f(-size, size, -size)
-    glVertex3f(-size, size, size)
-    glVertex3f(-size, -size, size)
-    glEnd()
-
-# Правая грань
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(size, -size, -size)
-    glVertex3f(size, -size, size)
-    glVertex3f(size, size, size)
-    glVertex3f(size, size, -size)
-    glEnd()
-
-# Нижняя грань
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(-size, -size, -size)
-    glVertex3f(-size, -size, size)
-    glVertex3f(size, -size, size)
-    glVertex3f(size, -size, -size)
-    glEnd()
-
-# Верхняя грань
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(-size, size, -size)
-    glVertex3f(-size, size, size)
-    glVertex3f(size, size, size)
-    glVertex3f(size, size, -size)
-    glEnd()
-
-# Задняя грань
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(-size, -size, -size)
-    glVertex3f(size, -size, -size)
-    glVertex3f(size, size, -size)
-    glVertex3f(-size, size, -size)
-    glEnd()
-
-# Передняя грань 
-    glBegin(GL_POLYGON)
-    glColor3f(*color)
-    glVertex3f(-size, -size, size)
-    glVertex3f(size, -size, size)
-    glVertex3f(size, size, size)
-    glVertex3f(-size, size, size)
+def draw_line():
+    global size
+    glBegin(GL_LINE)
+    glVertex3f(-size, size / 2, size / 2)
     glEnd()
     
 
 def display(window):
-	global size, color
+	global size
 	glClearColor(1.0, 1.0, 1.0, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 
@@ -149,23 +85,9 @@ def display(window):
 	glRotatef(angleY, 0.0, 1.0, 0.0)
 	glRotatef(angleZ, 0.0, 0.0, 1.0)
 	glScale(scale, scale, scale)
-
-   
-# Двигающийся куб
-	glPushMatrix()
-	size = 0.2
-	glColor3f(1, 0, 1)
-	draw_cube()
-
-# Статичный куб
-	
-	glLoadIdentity()
-	glTranslate(-0.3, 0.8, 0)
-	glScale(0.5, 0.5, 0.5)
-	glColor3f(1, 0, 0)
-	draw_cube()
-
-	glPopMatrix()
+    size = 0.5
+    glColor3f(1, 0, 0)
+    draw_line()
 
 
 	glfw.swap_buffers(window)
