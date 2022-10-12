@@ -54,6 +54,7 @@ if __name__ == '__main__':
     row_start = datetime.datetime.now()
     res1 = comp_matrix_mult_str_x_col(a_matrix, b_matrix)
     row_end = datetime.datetime.now()
+
     print('Single multiplication', row_end - row_start)
 
     # 4-part dividing
@@ -76,6 +77,7 @@ if __name__ == '__main__':
         c.append(elem)
 
     e = datetime.datetime.now()
+
     print("Calculation with 4-part dividing", e - s)
 
 
@@ -108,3 +110,6 @@ if __name__ == '__main__':
 
     e = datetime.datetime.now()
     print("Calculation with 16-part dividing",e - s)
+
+    
+
