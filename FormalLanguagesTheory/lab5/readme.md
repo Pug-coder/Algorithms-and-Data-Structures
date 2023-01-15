@@ -7,4 +7,5 @@ isInitial, isFinal (читаемые из входных данных), isTrap) 
 
 ## запуск:
 python main.py 1
+
 dot -Tsvg graph.dot > graph.svg
