@@ -4,3 +4,7 @@ isReading, isWriting (читаемые из входных данных), isDete
 
 ## атрибуты узлов: 
 isInitial, isFinal (читаемые из входных данных), isTrap) в пользовательском синтаксисе и реализовать генератор графов MFA. 
+
+## запуск:
+python main.py 1
+dot -Tsvg graph.dot > graph.svg

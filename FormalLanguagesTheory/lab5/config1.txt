@@ -1,0 +1,11 @@
+arrow = ->
+
+init_flag = is_start
+final_flag = is_final
+
+close_flag = my_c
+open_flag = my_o
+keep_flag = my_k
+
+eps = my_eps
+any = my_any

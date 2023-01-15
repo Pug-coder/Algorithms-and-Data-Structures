@@ -1,0 +1,19 @@
+q0 is_initial_def;
+q3 is_final_def label="is_final" ;
+
+q0 ->_def q1 2 o_def k_def; 
+q1 ->_def q2 1 c_def o_def ;
+q2 ->_def q3 a k_def k_def ;
+q2 ->_def q3 b k_def k_def ;
+q2 ->_def q3 c_def k_def k_def ;
+q3 ->_def q1 2 o_def c_def ;
+
+q0 ->_def trap b c_def c_def;
+q0 ->_def trap2 any_def c_def c_def;
+q0 ->_def abso_deflutely_no_deft_trap eps_def c_def c_def;
+
+trap ->_def trap a c_def c_def;
+trap ->_def trap a c_def c_def;
+trap ->_def trap b c_def c_def;
+
+q2 ->_def trap c_def k_def k_def;

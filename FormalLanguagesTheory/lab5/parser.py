@@ -14,8 +14,10 @@ config = {
 }
 
 
-def parse_config(filename):
-    with open(filename, "r") as f:
+def parse_config(filenum):
+    global config
+
+    with open(f"config{filenum}.txt", "r") as f:
         lines = f.readlines()
     for line in lines:
         line = "".join(filter(lambda x: not x.isspace(), line))
@@ -31,15 +33,19 @@ def parse_config(filename):
     assert not config["init_flag"].startswith("label=")
 
 
-def parse_mfa(filename):
-    with open(filename, "r") as f:
+def parse_mfa(filenum):
+    parse_config(filenum)
+    with open(f"automata{filenum}.mfa", "r") as f:
         raw = f.read()
     raw = "".join(list(filter(lambda x: x != "\n", raw)))
     raw = raw.split(";")
     raw = list(filter(bool, raw))
     declarations = list(map(lambda x: x.strip(), raw))
 
-    return [parse_declaration(declaration) for declaration in declarations]
+    return (
+        [parse_declaration(declaration) for declaration in declarations],
+        config,
+    )
 
 
 def parse_declaration(declaration):
@@ -57,14 +63,14 @@ def parse_declaration(declaration):
         declaration = declaration.strip()
 
         symbol = re.search(r"[^\s]+", declaration)[0]
-        if symbol == config["eps"]:
-            symbol = "eps"
-        elif symbol == config["any"]:
-            symbol = "any"
+        # if symbol in [config["eps"], config["any"]]:
+        # pass
+
         assert (
             len(symbol) == 1
+            and symbol.isalpha()
             or symbol == config["eps"]
-            or symbol == any
+            or symbol == config["any"]
             or symbol.isdigit
         )
         declaration = declaration[len(symbol) :]
@@ -74,12 +80,14 @@ def parse_declaration(declaration):
         while declaration:
             flag = re.search(r"[^\s]+", declaration)[0]
             assert flag
-            if flag == config["close_flag"]:
-                memory_flags.append("c")
-            elif flag == config["open_flag"]:
-                memory_flags.append("o")
-            elif flag == config["keep_flag"]:
-                memory_flags.append("◊")
+            print("CONNFIG:", config)
+            print("FLAG:", flag)
+            if flag in [
+                config["close_flag"],
+                config["open_flag"],
+                config["keep_flag"],
+            ]:
+                memory_flags.append(flag)
             else:
                 raise Exception("unknown flag")
             declaration = declaration[len(flag) :]
@@ -109,6 +117,8 @@ def parse_declaration(declaration):
             else:
                 flag = re.search(r"[^\s]+", declaration)[0]
                 assert flag
+                print("CONFIG", config)
+                print("FLAG", flag)
                 if flag == config["init_flag"]:
                     node_flags.append("init_flag")
                 elif flag == config["final_flag"]:
@@ -120,6 +130,3 @@ def parse_declaration(declaration):
                 declaration = declaration.strip()
 
         return ("node", {"id": id1, "label": label, "flags": node_flags})
-
-
-parse_config("config.txt")

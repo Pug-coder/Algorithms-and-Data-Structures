@@ -1,0 +1,19 @@
+q0 is_start;
+q3 is_final label="is_final" ;
+
+q0 -> q1 2 my_o my_k; 
+q1 -> q2 1 my_c my_o ;
+q2 -> q3 a my_k my_k ;
+q2 -> q3 b my_k my_k ;
+q2 -> q3 my_c my_k my_k ;
+q3 ->q1 2 my_o my_c ;
+
+q0 -> trap b my_c my_c;
+q0 -> trap2 my_any my_c my_c;
+q0 -> absolutely_not_trap my_eps my_c my_c;
+
+trap -> trap a my_c my_c;
+trap -> trap a my_c my_c;
+trap -> trap b my_c my_c;
+
+q2 -> trap my_c my_k my_k;
