@@ -5,13 +5,18 @@ from copy import copy, deepcopy
 
 
 class MFA:
-    def __init__(self, declarations):
+    def __init__(self, declarations, config):
         self.nodes = set()
         self.edges = set()
         self.lables = {}
         self.inits = set()
         self.finals = set()
         memory_len = -1
+        # self.eps_symbol = config['eps']
+        # self.any_symbol = config['any']
+        # self.open = config['open_flag']
+        # self.close = config['close_flag']
+        # self.keep = config['keep_flag']
 
         # here add what we parsed
         for dtype, dec in declarations:
@@ -45,10 +50,10 @@ class MFA:
                 # check is symbol normal
                 if symbol.isdigit():
                     assert int(symbol) <= memory_len and int(symbol) > 0
-                else:
-                    assert (
-                        symbol == "eps" or symbol == "any" or len(symbol) == 1
-                    )
+                # else:
+                #     assert (
+                #         symbol == "eps" or symbol == "any" or len(symbol) == 1
+                #     )
 
                 self.nodes.add(node_id1)
                 self.nodes.add(node_id2)
@@ -218,4 +223,6 @@ class MFA:
                 penwidth="3.5" if edge in self.deterministic else "2",
                 color=color,
             )
-        dot.render("graph")
+
+        with open("graph.dot", "w") as f:
+            f.write(dot.source)
