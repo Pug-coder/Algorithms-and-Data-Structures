@@ -1,19 +1,19 @@
 from parser import parse
 from copy import copy
-from itertools import combinations
+from itertools import product
+
 nonterms_dict = {}
 nonterms_dict = parse('input.txt')
 
-print(nonterms_dict)
+
 
 is_epsilon_generative = set()
 for nonterm, value in nonterms_dict.items():
     if 'ε' in value:
         is_epsilon_generative.add(nonterm)
 
-print(is_epsilon_generative)
+#print(is_epsilon_generative)
 eps_gen_nonterms_dict = copy(nonterms_dict)
-
 
 def eps_check(eps_gen_nonterms_dict, nonterms_dict):
     flag = False
@@ -34,49 +34,61 @@ def eps_check(eps_gen_nonterms_dict, nonterms_dict):
 
 eps_check(eps_gen_nonterms_dict, nonterms_dict)
 
-print(is_epsilon_generative)
-print(nonterms_dict)
-print(eps_gen_nonterms_dict)
+#print(is_epsilon_generative)
+#print(nonterms_dict)
+#print(eps_gen_nonterms_dict)
 
 
+final = {}
+def comb_finding(eps_gen_nonterms_dict):
+    for nonterm, val in eps_gen_nonterms_dict.items():
+        ans = []
+        l = [0 for k in range(len(val))]
 
-c = ['A','b','C','d','A','C']
-l = [0,0,0,0,0,0]
-ans = []
-for i, el in enumerate(c):
-    if el not in is_epsilon_generative:
-        l[i] = 1
+        for i, el in enumerate(val):
+            if el not in is_epsilon_generative:
+                l[i] = 1
+        combs = make_list_of_comb(l)
+        for comb in combs:
+            s = ''
+            for i, el in enumerate(val):
+                if el * comb[i] == '':
+                    continue
+                s += el * comb[i]
+            if s != '':
+                ans.append(s)
+        final[nonterm] = ans
+    return final
 
-s = ''
-for i, el in enumerate(c):
-    if el * l[i] == '':
-        continue
-    s += el*l[i]
-ans.append(s)
 
-for i, el in enumerate(c):
-    if el in is_epsilon_generative:
-        l[i] = 1
-        s = ''
-        for i1, el1 in enumerate(c):
-            if el1 * l[i1] == '':
-                continue
-            s += el1 * l[i1]
-        l[i] = 0
-        ans.append(s)
+def make_list_of_comb(l):
+    pos = [i for i, e in enumerate(l) if e == 1]
+    ans = []
+    new = [0 for i in range(len(l)-len(pos))]
+    d = product([0, 1], repeat=len(new))
 
-s = ''
-for el in c:
-    s += str(el)
-print(s)
-for i, j in enumerate(s):
-    if j in is_epsilon_generative:
-        temp = s
-        #s = s.replace(j, '', 1)
-        s = s[:i] + s[i+1:]
-        #if s in ans:
-            #s = temp.replace(temp[i], '')
-        #    s = temp[:i] + temp[i+1 : ]
-        ans.append(s)
-        s = temp
-print(ans)
+    for e in d:
+        ans.append(list(e))
+
+    for i in pos:
+        if i != len(l):
+            for j in ans:
+                j.insert(i,1)
+        else:
+            for j in ans:
+                j.append(1)
+    return ans
+
+
+def eps_deletion():
+    final = comb_finding(eps_gen_nonterms_dict)
+    #print(final)
+
+    for nonterm, value in final.items():
+        for i, symb in enumerate(value):
+            if symb == 'ε':
+                del value[i]
+            if 'ε' in symb:
+                value[i] = symb.replace('ε', '')
+    #print(final)
+    return final
