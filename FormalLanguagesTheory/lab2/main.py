@@ -1,4 +1,9 @@
 from epsilon_deletion import eps_deletion
 
 final = eps_deletion()
-print(final)
+
+for nonterm, value in final.items():
+    for val in value:
+        print(
+            f'{nonterm} -> {val}'
+        )

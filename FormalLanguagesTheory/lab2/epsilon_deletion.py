@@ -2,18 +2,17 @@ from parser import parse
 from copy import copy
 from itertools import product
 
+
 nonterms_dict = {}
 nonterms_dict = parse('input.txt')
-
-
-
+final = {}
 is_epsilon_generative = set()
 for nonterm, value in nonterms_dict.items():
     if 'ε' in value:
         is_epsilon_generative.add(nonterm)
 
-#print(is_epsilon_generative)
 eps_gen_nonterms_dict = copy(nonterms_dict)
+
 
 def eps_check(eps_gen_nonterms_dict, nonterms_dict):
     flag = False
@@ -34,17 +33,22 @@ def eps_check(eps_gen_nonterms_dict, nonterms_dict):
 
 eps_check(eps_gen_nonterms_dict, nonterms_dict)
 
-#print(is_epsilon_generative)
-#print(nonterms_dict)
-#print(eps_gen_nonterms_dict)
+
+def check_if_eps_in_start(eps_gen_nonterms_dict):
+    new_rule = {}
+    for nonterm in list(eps_gen_nonterms_dict.keys())[0]:
+        if 'ε' in eps_gen_nonterms_dict[nonterm]:
+            for val in eps_gen_nonterms_dict.values():
+                if nonterm in val:
+                    continue
+                new_rule[str(nonterm + "'")] = [nonterm, 'ε']
+                return new_rule
 
 
-final = {}
 def comb_finding(eps_gen_nonterms_dict):
     for nonterm, val in eps_gen_nonterms_dict.items():
         ans = []
         l = [0 for k in range(len(val))]
-
         for i, el in enumerate(val):
             if el not in is_epsilon_generative:
                 l[i] = 1
@@ -81,14 +85,15 @@ def make_list_of_comb(l):
 
 
 def eps_deletion():
+    new_rule = check_if_eps_in_start(eps_gen_nonterms_dict)
     final = comb_finding(eps_gen_nonterms_dict)
-    #print(final)
-
     for nonterm, value in final.items():
         for i, symb in enumerate(value):
             if symb == 'ε':
                 del value[i]
             if 'ε' in symb:
                 value[i] = symb.replace('ε', '')
-    #print(final)
+    if new_rule:
+        for nt, rule in new_rule.items():
+            final[nt] = [i for i in rule]
     return final
