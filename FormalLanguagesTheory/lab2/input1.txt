@@ -1,4 +1,5 @@
-S -> Bd
-B -> A
-A -> Ca
+S -> ABCd
+A -> aDA|ε
+B -> b|ε
 C -> c|ε
+D -> AK

@@ -1,4 +1,3 @@
-S -> ABCd
-A -> a|ε
-B -> AC
-C -> c|ε
+S -> Ac
+A -> SD|a
+D -> aD

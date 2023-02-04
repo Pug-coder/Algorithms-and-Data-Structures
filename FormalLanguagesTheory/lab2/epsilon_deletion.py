@@ -4,7 +4,7 @@ from itertools import product
 
 
 nonterms_dict = {}
-nonterms_dict = parse('input.txt')
+nonterms_dict, rules_dict = parse('input1.txt')
 final = {}
 is_epsilon_generative = set()
 for nonterm, value in nonterms_dict.items():
@@ -14,6 +14,7 @@ for nonterm, value in nonterms_dict.items():
 eps_gen_nonterms_dict = copy(nonterms_dict)
 
 
+# Поиск ε-порождающих нетерминалов
 def eps_check(eps_gen_nonterms_dict, nonterms_dict):
     flag = False
     for nonterm, value in eps_gen_nonterms_dict.items():
