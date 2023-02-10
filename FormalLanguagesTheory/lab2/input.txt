@@ -1,3 +1,0 @@
-S -> Ac
-A -> SD|a
-D -> aD

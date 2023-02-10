@@ -1,9 +1,8 @@
-from epsilon_deletion import eps_deletion
+from parser import CFG_Parser
+import sys
 
-final = eps_deletion()
+parser_obj = CFG_Parser(f'tests/test1.txt')
+grammar = parser_obj.parse_rules()
 
-for nonterm, value in final.items():
-    for val in value:
-        print(
-            f'{nonterm} -> {val}'
-        )
+g2 = grammar.lab_pipelene()
+print(g2)

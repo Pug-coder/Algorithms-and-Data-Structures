@@ -1,5 +1,0 @@
-S -> ABCd
-A -> aDA|ε
-B -> b|ε
-C -> c|ε
-D -> AK
